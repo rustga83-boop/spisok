@@ -1,6 +1,6 @@
 // Офлайн: приложение целиком лежит в кэше телефона, шрифт докачивается при первом запуске.
-const VERSION = 'spisok-4';
-const FILES = ['./', 'index.html', 'app.css', 'app.js', 'store.js', 'data.js', 'lion.js', 'lion-data.js', 'manifest.webmanifest', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
+const VERSION = 'spisok-5';
+const FILES = ['./', 'index.html', 'app.css', 'app.js', 'store.js', 'data.js', 'lion.js', 'lion-data.js', 'manifest.webmanifest', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/grain.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(FILES)).then(() => self.skipWaiting()));

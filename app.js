@@ -8,8 +8,8 @@ const $layer = document.getElementById('layer');
 const $toast = document.getElementById('toast');
 const ui = { screen: 'lists', listId: null, picked: {} };
 
-const ACC = { amber: '#FFA23A', ice: '#8FD6FF', lime: '#C9F26B', white: '#F0EEE9' };
-const ACC_NAMES = { amber: 'Янтарь', ice: 'Лёд', lime: 'Лайм', white: 'Без цвета' };
+const ACC = { amber: '#E8B04B', ice: '#8FD6FF', lime: '#C9F26B', white: '#F0EEE9' };
+const ACC_NAMES = { amber: 'Золото', ice: 'Лёд', lime: 'Лайм', white: 'Без цвета' };
 
 // ---------- мелочи ----------
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -43,12 +43,12 @@ function applyAccent() {
   document.documentElement.style.setProperty('--accent', c);
   const r = parseInt(c.slice(1, 3), 16), g = parseInt(c.slice(3, 5), 16), b = parseInt(c.slice(5, 7), 16);
   document.documentElement.style.setProperty('--accent-glow', `rgba(${r},${g},${b},0.55)`);
-  return `rgba(${r},${g},${b},0.6)`;
+  return `rgba(${r},${g},${b},0.75)`;
 }
 
 function lionBg() {
-  const svg = $app.querySelector('.lion-bg');
-  if (svg) mountLion(svg, 334, 176, 1.3, { eye: applyAccent() });
+  const box = $app.querySelector('.lion-bg');
+  if (box) mountLion(box, 390, 520, 334, 176, 1.3, { eye: applyAccent() });
 }
 
 // ---------- экраны ----------
@@ -99,7 +99,7 @@ function viewLists() {
     </button>`;
   };
   return `<section class="screen">
-    <svg class="lion-bg" viewBox="0 0 390 520" aria-hidden="true"></svg>
+    <div class="lion-bg" aria-hidden="true"></div>
     <div class="bar"><button class="round" data-act="settings" aria-label="Настройки">${icon(I.gear, 19, 1.6)}</button></div>
     <div class="head"><div class="caps">${esc(dateCaps())}</div><h1 class="title">Списки</h1></div>
     <button class="hero" data-open="${hero.id}" data-hold-list="${hero.id}" aria-label="Открыть список ${esc(hero.name)}">
@@ -112,7 +112,7 @@ function viewLists() {
     </button>
     ${rows.length ? `<div class="sec"><span class="caps">Все списки</span><span class="n">${rows.length}</span></div><div class="well">${rows.map(rowHtml).join('')}</div>` : ''}
     <div class="sign">Список покупок</div>
-    <div class="dock"><button class="lac main" data-act="new-list">${icon(I.plus, 20, 2.2, 'var(--accent)')}Новый список</button></div>
+    <div class="dock"><button class="lac main gold" data-act="new-list">${icon(I.plus, 20, 2.4, '#1B1205')}Новый список</button></div>
   </section>`;
 }
 
@@ -135,7 +135,7 @@ function viewList() {
   const pct = total ? Math.round(bought.length / total * 100) : 0;
   const groups = DEPTS.map((d) => ({ d, items: open.filter((i) => i.dept === d.id) })).filter((g) => g.items.length);
   return `<section class="screen">
-    <svg class="lion-bg" viewBox="0 0 390 520" aria-hidden="true"></svg>
+    <div class="lion-bg" aria-hidden="true"></div>
     <div class="bar">
       <button class="round" data-act="back" aria-label="Назад к спискам">${icon(I.back, 18, 1.8)}</button>
       <button class="round" data-act="invite" aria-label="Участники">${icon(I.people, 20, 1.6)}</button>
@@ -149,8 +149,8 @@ function viewList() {
     ${!open.length ? `<div class="well" style="margin-top:22px"><div class="empty">${total ? 'Всё куплено. Можно очистить купленное или добавить новое.' : 'Список пуст. Добавь продукт строкой внизу или открой «Набор» — там то, что вы берёте чаще всего.'}</div></div>` : ''}
     ${bought.length ? `<div class="sec"><span class="caps">Куплено · ${bought.length}</span><button data-act="clear">Очистить</button></div><div class="well">${bought.map(itemRow).join('')}</div>` : ''}
     <div class="dock">
-      <button class="lac compose" data-act="add">${icon(I.plus, 20, 2.2, 'var(--accent)')}<span>Добавить продукт</span></button>
-      <button class="lac icon" data-act="usual" aria-label="Обычный набор">${icon(I.set, 22, 1.7, '#F0EEE9')}</button>
+      <button class="lac compose gold" data-act="add">${icon(I.plus, 20, 2.4, '#1B1205')}<span>Добавить продукт</span></button>
+      <button class="lac icon gold" data-act="usual" aria-label="Обычный набор">${icon(I.set, 22, 2, '#1B1205')}</button>
     </div>
   </section>`;
 }
@@ -161,7 +161,7 @@ function viewUsual() {
   const picked = set.filter((h) => !h.inList && ui.picked[norm(h.name)] !== false);
   const cnt = picked.length;
   return `<section class="screen">
-    <svg class="lion-bg" viewBox="0 0 390 520" aria-hidden="true"></svg>
+    <div class="lion-bg" aria-hidden="true"></div>
     <div class="bar"><button class="round" data-act="back" aria-label="Назад к списку">${icon(I.back, 18, 1.8)}</button></div>
     <div class="head">
       <div class="caps">В «${esc(l.name)}»</div>
@@ -176,13 +176,13 @@ function viewUsual() {
         ${h.inList ? '<span class="sub" style="padding-right:10px">уже в списке</span>' : `<button class="check" data-pick="${esc(key)}" aria-pressed="${on}" aria-label="${on ? 'Не добавлять' : 'Добавить'}: ${esc(h.name)}">${on ? DISC : '<span class="ring"></span>'}</button>`}</div>`;
     }).join('')}</div>`
     : `<div class="well" style="margin-top:22px"><div class="empty">Набор соберётся сам: сюда попадёт всё, что вы купили хотя бы два раза. Отмечай покупки галочками — и через пару походов в магазин здесь будет ваш «костяк».</div></div>`}
-    <div class="dock"><button class="lac main" data-act="add-usual" ${cnt ? '' : 'disabled'}>${icon(I.plus, 20, 2.2, 'var(--accent)')}${cnt ? `Добавить ${cnt} ${plural(cnt, 'пункт', 'пункта', 'пунктов')}` : 'Нечего добавлять'}</button></div>
+    <div class="dock"><button class="lac main gold" data-act="add-usual" ${cnt ? '' : 'disabled'}>${icon(I.plus, 20, 2.4, '#1B1205')}${cnt ? `Добавить ${cnt} ${plural(cnt, 'пункт', 'пункта', 'пунктов')}` : 'Нечего добавлять'}</button></div>
   </section>`;
 }
 
 function viewInvite() {
   return `<section class="screen">
-    <svg class="lion-bg" viewBox="0 0 390 520" aria-hidden="true"></svg>
+    <div class="lion-bg" aria-hidden="true"></div>
     <div class="bar"><button class="round" data-act="back" aria-label="Назад к списку">${icon(I.back, 18, 1.8)}</button></div>
     <div class="head"><div class="caps">${esc(list().name)}</div><h1 class="title" style="font-size:46px">Участники</h1></div>
     <div class="well" style="margin-top:16px"><div style="display:flex;gap:14px;padding:18px">
@@ -193,45 +193,87 @@ function viewInvite() {
 }
 
 // ---------- плашки ----------
+let unfit = null;
 function openLayer(html, after) {
   $layer.innerHTML = `<div class="scrim" data-act="close"></div>${html}`;
   $layer.classList.add('open');
+  document.body.classList.add('sheet-open');
   if (after) after($layer);
 }
-function closeLayer() { $layer.classList.remove('open'); $layer.innerHTML = ''; }
+function closeLayer() {
+  $layer.classList.remove('open');
+  $layer.innerHTML = '';
+  document.body.classList.remove('sheet-open');
+  if (unfit) { unfit(); unfit = null; }
+}
 
-// Добавление и правка пункта: поле + подсказки + количество/отдел/уточнение
+// Высокая плашка всегда помещается над клавиатурой (iPhone не сжимает страницу, сжимается только «видимая» часть)
+function fitAboveKeyboard($sheet) {
+  const vv = window.visualViewport;
+  if (!vv) return;
+  const fit = () => {
+    $layer.style.transform = `translateY(${vv.offsetTop}px)`;
+    $sheet.style.height = Math.max(240, vv.height - $sheet.offsetTop - 6) + 'px';
+  };
+  vv.addEventListener('resize', fit);
+  vv.addEventListener('scroll', fit);
+  fit();
+  unfit = () => { vv.removeEventListener('resize', fit); vv.removeEventListener('scroll', fit); $layer.style.transform = ''; };
+}
+
+// Нажатия внутри плашки: срабатывают с первого касания и не закрывают клавиатуру
+function onTap($root, act) {
+  let start = null;
+  $root.addEventListener('touchstart', (e) => { const t = e.touches[0]; start = { x: t.clientX, y: t.clientY }; }, { passive: true });
+  $root.addEventListener('touchend', (e) => {
+    const b = e.target.closest('button');
+    if (!b || !start || b.disabled) return;
+    const t = e.changedTouches[0];
+    if (Math.hypot(t.clientX - start.x, t.clientY - start.y) > 10) return;   // это была прокрутка
+    e.preventDefault();
+    act(b);
+  });
+  $root.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b && !b.disabled) { e.preventDefault(); act(b); } });
+}
+
+// Добавление и правка пункта: поле, сразу под ним количество и отдел, ниже подсказки и «Добавлено»
 function itemSheet(item) {
   const l = list();
-  const st = item ? { name: item.name, qty: item.qty, unit: item.unit || 'шт', note: item.note, dept: item.dept, deptSet: true }
-    : { name: '', qty: 0, unit: 'шт', note: '', dept: 'other', deptSet: false, more: false };
+  const fresh = () => ({ name: '', qty: 0, unit: 'шт', note: '', dept: 'other', deptSet: false, more: false, touched: false, picking: false });
+  const st = item ? { ...fresh(), name: item.name, qty: item.qty, unit: item.unit || 'шт', note: item.note, dept: item.dept, deptSet: true, touched: true } : fresh();
+  const added = [];
+  let sugMap = {};
   openLayer(`<div class="sheet tall" role="dialog" aria-label="${item ? 'Изменить пункт' : 'Новый пункт'}">
       <div class="grab"></div>
       <div class="sheet-head"><h2>${item ? 'Изменить' : 'Новый пункт'}</h2><button class="round" data-act="close" aria-label="Закрыть">${icon(I.x, 15, 2)}</button></div>
       <form class="field focus" data-form="1">
         <label style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)" for="f-name">Что купить</label>
         <input id="f-name" autocomplete="off" autocapitalize="sentences" enterkeyhint="done" placeholder="Что купить" value="${esc(st.name)}">
-        <button class="lac icon" type="submit" style="width:44px;height:44px" aria-label="${item ? 'Сохранить' : 'Добавить'}">${icon(item ? I.check : I.plus, 20, 2.2, 'var(--accent)')}</button>
+        <button class="lac icon gold" type="button" data-act="submit" style="width:44px;height:44px" aria-label="${item ? 'Сохранить' : 'Добавить'}">${icon(item ? I.check : I.plus, 20, 2.4, '#1B1205')}</button>
       </form>
-      <div data-sug></div>
       <div data-more></div>
-      <div class="note" data-hint>${item ? '' : 'Пиши как в заметке — отдел определится сам. Нажми подсказку, и пункт добавится с прошлым количеством.'}</div>
+      <div data-sug></div>
+      <div data-added></div>
+      <div class="note" data-hint>${item ? '' : 'Пиши как в заметке — отдел определится сам. Нажми подсказку — пункт сразу добавится с прошлым количеством.'}</div>
     </div>`, ($l) => {
+    const $sheet = $l.querySelector('.sheet');
     const $in = $l.querySelector('#f-name');
     const $more = $l.querySelector('[data-more]');
     const $sug = $l.querySelector('[data-sug]');
+    const $added = $l.querySelector('[data-added]');
     const $hint = $l.querySelector('[data-hint]');
+    const deptNow = () => (st.deptSet ? st.dept : guessDept(st.name));
     const drawMore = () => {
-      if (!st.name.trim() && !item) { $more.innerHTML = ''; return; }
-      const dept = st.deptSet ? st.dept : guessDept(st.name);
-      $more.innerHTML = `<div style="display:flex;flex-direction:column;gap:12px">
-        <div class="opts">
+      const note = st.more || st.note;
+      $more.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px">
+        <div class="opts one">
           <div class="step"><button type="button" data-q="-1" aria-label="Меньше">−</button><b>${st.qty ? String(st.qty).replace('.', ',') : '—'}</b><button type="button" data-q="1" aria-label="Больше">+</button></div>
-          ${UNITS.map((u) => `<button type="button" class="chip${st.unit === u ? ' on' : ''}" data-u="${u}">${u}</button>`).join('')}
+          ${UNITS.map((u) => `<button type="button" class="chip${st.qty && st.unit === u ? ' on' : ''}" data-u="${u}">${u}</button>`).join('')}
         </div>
-        <div class="opts"><button type="button" class="chip on" data-act="dept">${icon(I.check, 14, 2.6, 'var(--accent)')}${esc(deptName(dept))}</button>
-          ${st.more || st.note ? '' : '<button type="button" class="chip" data-act="more">+ уточнение</button>'}</div>
-        ${st.more || st.note ? `<div class="field"><input data-note placeholder="Уточнение: например, только 3,2 %" value="${esc(st.note)}"></div>` : ''}
+        <div class="opts one"><button type="button" class="chip on" data-act="dept">${icon(I.check, 14, 2.6, 'var(--accent)')}${esc(deptName(deptNow()))}</button>
+          ${note ? '' : '<button type="button" class="chip" data-act="more">+ уточнение</button>'}</div>
+        ${note ? `<div class="field"><input data-note placeholder="Уточнение: например, только 3,2 %" value="${esc(st.note)}"></div>` : ''}
+        ${st.picking ? `<div class="well"><div class="caps" style="padding:14px 18px 6px">Отдел</div>${DEPTS.map((d) => `<button type="button" class="setting" data-d="${d.id}"><span>${esc(d.name)}</span>${d.id === deptNow() ? icon(I.check, 18, 2.4, 'var(--accent)') : ''}</button>`).join('')}</div>` : ''}
       </div>`;
       const $note = $more.querySelector('[data-note]');
       if ($note) $note.oninput = () => { st.note = $note.value; };
@@ -239,7 +281,8 @@ function itemSheet(item) {
     const drawSug = () => {
       if (item) { $sug.innerHTML = ''; return; }
       const sug = S.suggest(l, st.name);
-      $hint.style.display = st.name ? 'none' : '';
+      $hint.style.display = st.name || added.length ? 'none' : '';
+      sugMap = Object.fromEntries(sug.map((s) => [s.name, s]));
       if (!sug.length) { $sug.innerHTML = ''; return; }
       const q = norm(st.name);
       const mark = (name) => {
@@ -248,54 +291,56 @@ function itemSheet(item) {
         return at >= 0 && n.slice(at, at + q.length) === q ? `${esc(name.slice(0, at))}<em>${esc(name.slice(at, at + q.length))}</em>${esc(name.slice(at + q.length))}` : esc(name);
       };
       const mine = sug.filter((s) => s.mine), dict = sug.filter((s) => !s.mine);
-      const rowsHtml = (arr) => arr.map((s) => `<button class="sug" data-sug-name="${esc(s.name)}" ${s.inList ? 'disabled' : ''}><span class="txt"><span class="nm">${mark(s.name)}</span><span class="sub">${esc([s.sub, deptName(s.dept)].filter(Boolean).join(' · '))}</span></span>${s.inList ? '<small>уже в списке</small>' : icon(I.plus, 20, 2.2, 'var(--accent)')}</button>`).join('');
+      const rowsHtml = (arr) => arr.map((s) => `<button type="button" class="sug" data-sug-name="${esc(s.name)}" ${s.inList ? 'disabled' : ''}><span class="txt"><span class="nm">${mark(s.name)}</span><span class="sub">${esc([s.sub, deptName(s.dept)].filter(Boolean).join(' · '))}</span></span>${s.inList ? '<small>уже в списке</small>' : icon(I.plus, 20, 2.2, 'var(--accent)')}</button>`).join('');
       $sug.innerHTML = `<div class="well">${mine.length ? `<div class="caps" style="padding:14px 18px 4px">Вы покупали</div>${rowsHtml(mine)}` : ''}${dict.length ? `<div class="caps" style="padding:14px 18px 4px;${mine.length ? 'border-top:1px solid var(--line)' : ''}">${mine.length ? 'Ещё не покупали' : 'Подсказки'}</div>${rowsHtml(dict)}` : ''}</div>`;
-      sugMap = Object.fromEntries(sug.map((s) => [s.name, s]));
     };
-    let sugMap = {};
-    const reset = () => { Object.assign(st, { name: '', qty: 0, unit: 'шт', note: '', dept: 'other', deptSet: false, more: false }); $in.value = ''; drawMore(); drawSug(); $in.focus(); };
+    const drawAdded = () => {
+      if (!added.length) { $added.innerHTML = ''; return; }
+      $added.innerHTML = `<div class="sec" style="padding-top:6px"><span class="caps">Добавлено</span><span class="n">${added.length}</span></div>
+        <div class="well added">${added.slice().reverse().map((it) => `<div class="row"><span class="ok">${icon(I.check, 13, 3, '#1B1205')}</span>
+          <span class="txt"><span class="name"><span>${esc(it.name)}</span></span><span class="sub">${esc([S.subText(it), deptName(it.dept)].filter(Boolean).join(' · '))}</span></span>
+          <button type="button" class="x" data-undo="${it.id}" aria-label="Убрать: ${esc(it.name)}">${icon(I.x, 16, 2)}</button></div>`).join('')}</div>`;
+    };
+    const drawAll = () => { drawMore(); drawSug(); drawAdded(); };
+    const reset = () => { Object.assign(st, fresh()); $in.value = ''; drawAll(); };
     const commit = (data) => {
       if (item) { S.updateItem(l, item, data); closeLayer(); render(); return; }
       const r = S.addItem(l, data);
       if (!r) return;
+      if (r.dup) toast(`«${r.item.name}» уже в списке`);
+      else added.push(r.item);
       render();
-      toast(r.dup ? `«${r.item.name}» уже в списке` : `Добавлено: ${r.item.name}`);
       reset();
     };
+    const typed = () => ({ name: st.name, qty: st.qty, unit: st.qty ? st.unit : '', note: st.note, dept: deptNow() });
     $in.oninput = () => { st.name = $in.value; drawMore(); drawSug(); };
-    $l.querySelector('[data-form]').onsubmit = (e) => {
-      e.preventDefault();
-      if (!st.name.trim()) { if (!item) closeLayer(); return; }
-      commit({ name: st.name, qty: st.qty, unit: st.qty ? st.unit : '', note: st.note, dept: st.deptSet ? st.dept : guessDept(st.name) });
-    };
-    $l.querySelector('.sheet').addEventListener('click', (e) => {
-      const b = e.target.closest('button');
-      if (!b) return;
+    $l.querySelector('[data-form]').onsubmit = (e) => { e.preventDefault(); if (st.name.trim()) commit(typed()); };
+    onTap($sheet, (b) => {
+      if (b.dataset.act === 'close') return closeLayer();
+      if (b.dataset.act === 'submit') { if (st.name.trim()) commit(typed()); else if (!item) closeLayer(); return; }
       if (b.dataset.q) {
         const step = st.unit === 'кг' || st.unit === 'л' ? 0.5 : st.unit === 'г' ? 100 : 1;
         st.qty = Math.max(0, Math.round((st.qty + step * Number(b.dataset.q)) * 10) / 10);
-        drawMore();
-      } else if (b.dataset.u) { st.unit = b.dataset.u; if (!st.qty) st.qty = b.dataset.u === 'г' ? 100 : 1; drawMore(); }
+        st.touched = true; drawMore();
+      } else if (b.dataset.u) { st.unit = b.dataset.u; if (!st.qty) st.qty = b.dataset.u === 'г' ? 100 : 1; st.touched = true; drawMore(); }
       else if (b.dataset.act === 'more') { st.more = true; drawMore(); $more.querySelector('[data-note]').focus(); }
-      else if (b.dataset.act === 'dept') deptPicker(st.deptSet ? st.dept : guessDept(st.name), (d) => { st.dept = d; st.deptSet = true; drawMore(); });
-      else if (b.dataset.sugName) {
-        const s = sugMap[b.dataset.sugName];
-        commit({ name: s.name, qty: s.qty || 0, unit: s.unit || '', note: s.note || '', dept: s.dept || guessDept(s.name) });
+      else if (b.dataset.act === 'dept') { st.picking = !st.picking; drawMore(); }
+      else if (b.dataset.d) { st.dept = b.dataset.d; st.deptSet = true; st.picking = false; drawMore(); }
+      else if (b.dataset.undo) {
+        const it = added.find((x) => x.id === b.dataset.undo);
+        if (it) { S.removeItem(l, it); added.splice(added.indexOf(it), 1); render(); drawSug(); drawAdded(); }
+      } else if (b.dataset.sugName) {
+        const sg = sugMap[b.dataset.sugName];
+        if (!sg) return;
+        // своё количество, если уже выставил руками; иначе — как в прошлый раз
+        commit(st.touched ? { name: sg.name, qty: st.qty, unit: st.qty ? st.unit : '', note: st.note || sg.note || '', dept: st.deptSet ? st.dept : sg.dept || guessDept(sg.name) }
+          : { name: sg.name, qty: sg.qty || 0, unit: sg.unit || '', note: sg.note || '', dept: sg.dept || guessDept(sg.name) });
       }
     });
-    drawMore(); drawSug();
+    drawAll();
+    fitAboveKeyboard($sheet);
     setTimeout(() => $in.focus(), 60);
   });
-}
-
-function deptPicker(current, done) {
-  const $sheet = $layer.querySelector('.sheet');
-  const panel = document.createElement('div');
-  panel.className = 'well';
-  panel.innerHTML = `<div class="caps" style="padding:14px 18px 6px">Отдел</div>` + DEPTS.map((d) => `<button class="setting" data-d="${d.id}"><span>${esc(d.name)}</span>${d.id === current ? icon(I.check, 18, 2.4, 'var(--accent)') : ''}</button>`).join('');
-  panel.onclick = (e) => { const b = e.target.closest('[data-d]'); if (b) { panel.remove(); done(b.dataset.d); } };
-  $sheet.querySelector('[data-more]').after(panel);
-  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 // Долгое нажатие на пункт: «Не было», изменить, перенести, удалить
@@ -457,9 +502,14 @@ document.addEventListener('touchend', (e) => {
 });
 
 const tilt = startLight();
+// Блики глянцевых и золотых кнопок обновляем не чаще 20 раз в секунду — этого глазу хватает, а телефону легче
+let lastVars = 0;
 onLight((L) => {
-  document.documentElement.style.setProperty('--lx', L.x.toFixed(3));
-  document.documentElement.style.setProperty('--ly', L.y.toFixed(3));
+  const now = performance.now();
+  if (now - lastVars < 50) return;
+  lastVars = now;
+  document.documentElement.style.setProperty('--lx', L.x.toFixed(2));
+  document.documentElement.style.setProperty('--ly', L.y.toFixed(2));
 });
 // На iPhone наклон разрешается касанием: спрашиваем один раз при первом нажатии
 if (tilt.needsPermission && !localStorage.getItem('spisok.tiltAsked')) {

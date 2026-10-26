@@ -7,8 +7,9 @@
   --text3: #8E8B85;
   --line: rgba(240, 238, 233, 0.06);
   --miss: #F2705F;
-  --accent: #FFA23A;
-  --accent-glow: rgba(255, 162, 58, 0.55);
+  --accent: #E8B04B;
+  --accent-glow: rgba(232, 176, 75, 0.55);
+  --gold: radial-gradient(55% 140% at calc(var(--lx) * 100%) 0%, rgba(255, 250, 230, 0.75) 0%, rgba(255, 250, 230, 0) 65%), linear-gradient(180deg, #F3D48C 0%, #DDA94A 38%, #B07A22 72%, #7E5414 100%);
   --lx: 0.28;
   --ly: 0.22;
   --serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
@@ -24,8 +25,9 @@
 html, body { margin: 0; min-height: 100%; }
 html { background: #121214; }
 body {
-  background: radial-gradient(110% 80% at calc(var(--lx) * 100%) calc(var(--ly) * 100%), rgba(240, 238, 233, 0.045), rgba(240, 238, 233, 0) 70%), var(--bg);
-  background-attachment: fixed;
+  /* фон статичный: зерно готовой картинкой, мягкий свет сверху-слева — ничего не перерисовывается при наклоне */
+  background: url(icons/grain.png) repeat, radial-gradient(110% 80% at 28% 18%, rgba(240, 238, 233, 0.045), rgba(240, 238, 233, 0) 70%), var(--bg);
+  background-size: 128px 128px, auto, auto;
   color: var(--text);
   font: 16px/1.3 var(--sans);
   overscroll-behavior: none;
@@ -36,7 +38,6 @@ body {
 button, input { font: inherit; color: inherit; }
 button { cursor: pointer; }
 input { -webkit-user-select: text; user-select: text; }
-.grain { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
 
 #app { position: relative; z-index: 1; min-height: 100%; }
 .screen { position: relative; min-height: 100vh; min-height: 100dvh; padding: calc(var(--top) + 8px) 16px calc(var(--bottom) + 110px); overflow: hidden; }
@@ -99,6 +100,11 @@ input { -webkit-user-select: text; user-select: text; }
 .lac.compose { flex-grow: 1; color: var(--text2); font-size: 16px; text-align: left; }
 .lac.compose span { flex-grow: 1; }
 .lac.icon { width: 56px; padding: 0; justify-content: center; flex-shrink: 0; }
+/* золото: янтарный металл, блик едет за светом */
+.lac.gold { background: var(--gold); border-color: rgba(255, 236, 190, 0.55); color: #1B1205; box-shadow: inset 0 1px 0 rgba(255, 248, 225, 0.7), inset 0 -1px 0 rgba(90, 55, 10, 0.5), 0 14px 28px -10px rgba(0, 0, 0, 0.9), 0 0 24px -8px rgba(232, 176, 75, 0.45); text-shadow: 0 1px 0 rgba(255, 240, 200, 0.45); }
+.lac.gold.compose { color: #2A1C08; }
+body.sheet-open .dock { display: none; }
+body.sheet-open { overflow: hidden; }
 .lac:disabled { opacity: 0.45; }
 
 /* плашки поверх экрана */
@@ -106,7 +112,13 @@ input { -webkit-user-select: text; user-select: text; }
 #layer.open { pointer-events: auto; }
 .scrim { position: absolute; inset: 0; background: rgba(6, 6, 8, 0.66); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); animation: fade 0.18s ease-out; }
 .sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: calc(100% - var(--top) - 12px); display: flex; flex-direction: column; gap: 14px; padding: 10px 16px calc(var(--bottom) + 8px); border-radius: 30px 30px 0 0; background: linear-gradient(180deg, #19191C 0%, #121214 100%); border-top: 1px solid rgba(255, 255, 255, 0.07); box-shadow: 0 -30px 60px -20px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.06); animation: up 0.24s cubic-bezier(0.2, 0.8, 0.2, 1); overflow-y: auto; }
-.sheet.tall { top: calc(var(--top) + 12px); }
+.sheet.tall { top: calc(var(--top) + 12px); bottom: auto; height: calc(100% - var(--top) - 12px); }
+.added .row { min-height: 50px; }
+.added .x { width: 40px; height: 40px; border: 0; background: none; padding: 0; display: flex; align-items: center; justify-content: center; color: var(--text3); }
+.added .ok { width: 22px; height: 22px; border-radius: 11px; background: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.opts.one { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+.opts.one::-webkit-scrollbar { display: none; }
+.opts.one > * { flex-shrink: 0; }
 .grab { align-self: center; width: 38px; height: 5px; border-radius: 3px; background: rgba(240, 238, 233, 0.16); flex-shrink: 0; }
 .sheet-head { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
 .sheet-head h2 { margin: 0; font: 600 30px/1 var(--serif); }
