@@ -14,6 +14,39 @@ const PATHS = LION.map((f) => {
   return p;
 });
 
+// Рамки глаз — для объёмного градиента «стекляшки»
+const EYES = LION.map((f, i) => {
+  if (f.k !== 3) return null;
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (let j = 0; j < f.p.length; j += 2) { x0 = Math.min(x0, f.p[j]); x1 = Math.max(x1, f.p[j]); y0 = Math.min(y0, f.p[j + 1]); y1 = Math.max(y1, f.p[j + 1]); }
+  return { i, x0, y0, w: x1 - x0, h: y1 - y0 };
+}).filter(Boolean);
+
+// Глаз — гладкая янтарная стекляшка: светится изнутри, фокус блика и полоса отражения едут за светом
+function paintEye(ctx, e, s) {
+  const cx = e.x0 + e.w * 0.5, cy = e.y0 + e.h * 0.55;
+  const fx = e.x0 + e.w * (0.5 + (light.x - 0.5) * 0.9), fy = e.y0 + e.h * (0.5 + (light.y - 0.5) * 0.9);
+  const r = Math.max(e.w, e.h) * 0.78;
+  const g = ctx.createRadialGradient(fx, fy, 0, cx, cy, r);
+  g.addColorStop(0, '#FFF6DC');
+  g.addColorStop(0.22, '#F7C863');
+  g.addColorStop(0.62, '#C47B17');
+  g.addColorStop(1, '#3E2304');
+  ctx.fillStyle = g;
+  ctx.fill(PATHS[e.i]);
+  const bc = Math.min(Math.max(light.x, 0.05), 0.95);
+  const a = 0.25 + 0.45 * (1 - Math.abs(light.y - 0.3));
+  const band = ctx.createLinearGradient(e.x0, e.y0, e.x0 + e.w, e.y0 + e.w * 0.35);
+  band.addColorStop(Math.max(0, bc - 0.16), 'rgba(255,255,255,0)');
+  band.addColorStop(bc, `rgba(255,255,255,${a.toFixed(2)})`);
+  band.addColorStop(Math.min(1, bc + 0.16), 'rgba(255,255,255,0)');
+  ctx.fillStyle = band;
+  ctx.fill(PATHS[e.i]);
+  ctx.lineWidth = 0.6 / s;
+  ctx.strokeStyle = '#0A0806';
+  ctx.stroke(PATHS[e.i]);
+}
+
 export function onLight(fn) { listeners.add(fn); fn(light); }
 
 // Чёрный лак: отражение «комнаты» (светлее сверху) + острый блик от источника
@@ -63,10 +96,12 @@ function paint(lion) {
   ctx.lineWidth = 0.9 / s;
   ctx.strokeStyle = '#121214';
   for (let i = 0; i < LION.length; i++) {
+    if (LION[i].k === 3) continue;
     ctx.fillStyle = fill(LION[i].n, LION[i].k, L, strength, soft, eye);
     ctx.fill(PATHS[i]);
     ctx.stroke(PATHS[i]);
   }
+  for (const e of EYES) paintEye(ctx, e, s);
 }
 
 // Свет догоняет цель плавно: грани переливаются, а не прыгают; когда догнал — рисование останавливается
